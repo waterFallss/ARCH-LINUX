@@ -1,24 +1,28 @@
 # ARCH-LINUX
-#### Table of Contents
+![ARCH](ARCH_PIC.jpg)
+
+#### Table of Contents 📑
 1. [Arch Linux Downloads and Pre-Installation Steps](#preinstall)
 2. [Installation Steps on VMWare](#vmware)
 3. [Check Connection with the Internet](#connection)
 4. [Update System Clock](#clock)
-5. [Formatting the Partitions](#format)
-6. [Mirror Selection](#mirror)
-7. [Mount File Systems](#mount)
-8. [Package Installation Including Another Shell](#package)
-9. [System Configuration](#configure)
-10. [Network Configuration](#network)
-11. [Username and Password](#userPass)
-12. [Setting Up the Desktop Environment](#desktop)
-13. [Shut Down](#off)
-14. [Installing SSH](#ssh)
-15. [Terminal Color-Coding](#terminalColor)
-16. [Adding Aliases](#alias)
-17. [Error: Quick Fixes](#error)
+5. [Partitioning](#partition)
+6. [Formatting the Partitions](#format)
+7. [Mirror Selection](#mirror)
+8. [Mount File Systems](#mount)
+9. [Package Installation Including Another Shell](#package)
+10. [System Configuration](#configure)
+11. [Network Configuration](#network)
+12. [Username and Password](#userPass)
+13. [Setting Up the Desktop Environment](#desktop)
+14. [Shut Down](#off)
+15. [Installing SSH](#ssh)
+16. [Terminal Color-Coding](#terminalColor)
+17. [Adding Aliases](#alias)
+18. [Error: Quick Fixes](#error)
+19. [References](#reference)
 
-#### Arch Linux Downloads and Pre-Installation Steps <a name="preinstall"></a>
+#### Arch Linux Downloads and Pre-Installation Steps 🅰️ <a name="preinstall"></a>
 ***
 1. [Arch Linux Installation Guide](https://wiki.archlinux.org/title/Installation_guide)
 2. Download ISO from your country: [ISO Download](https://archlinux.org/download/)
@@ -28,7 +32,7 @@
 ```GPG Verification
  gpg --keyserver-options auto-key-retrieve --verify archlinux-version-x86_64.iso.sig   
 ```
-#### Installation Steps on VMWare <a name="vmware"></a>
+#### Installation Steps on VMWare ✏️ <a name="vmware"></a>
 ***
 1. Click on File
 2. Click on "New Virtual Machine"
@@ -45,7 +49,7 @@
 ```
 cat /sys/firmware/efi/fw_platform_size
 ```
-#### Check Connection with the Internet <a name="connection"></a>
+#### Check Connection with the Internet 🖨️ <a name="connection"></a>
 ***
 1. Check to see if your network interface is listed and enabled:
 ```
@@ -55,7 +59,7 @@ ip link
 ```
 ping archlinux.org
 ```
-#### Update System Clock <a name="clock"></a>
+#### Update System Clock ⏰ <a name="clock"></a>
 ***
 1. Check the time zone.
 ```
@@ -68,7 +72,7 @@ timedatectl list-timezones
 ```
 timedatectl set-timezone [TIME_ZONE]
 ```
-__Partitioning__
+#### Partitioning 🗃️ <a name="partition"></a>
 ***
 1. Create EFI System Partition
 ```
@@ -90,7 +94,7 @@ First Sector: [TYPE_DEFAULT_VALUE]
 Last Sector: [VALUE_OF_CHOICE] (For this, +18G was added)
 Command (m for help): w (Write table to disk and exit.)
 ```
-#### Formatting the Partitions <a name="format"></a>
+#### Formatting the Partitions ℹ️ <a name="format"></a>
 ***
 1. For the Root Partition
 ```
@@ -102,7 +106,7 @@ Example: mkfs.ext4 /dev/sda2
 mkfs.fat -F 32 /dev/[EFI_SYSTEM_PAARTITION]
 Example: mkfs -F 32 /dev/sda1
 ```
-#### Mirror Selection <a name="mirror"></a>
+#### Mirror Selection 🪞 <a name="mirror"></a>
 ***
 1. Enable pacman to be able to download and install software
 ```
@@ -120,7 +124,7 @@ cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
 ```
 reflector -c "US" -f 12 -l 10 -n 12 --save /etc/pacman.d/mirrorlist
 ```
-#### Mount File Systems <a name="mount"></a>
+#### Mount File Systems 📂 <a name="mount"></a>
 ***
 1. Mount Root Partition
 ```
@@ -138,13 +142,13 @@ sudo fdisk -l
 OR
 df -h
 ```
-#### Basic Installation <a name="package"></a>
+#### Basic Installation 🖥️ <a name="package"></a>
 ***
 1. Install Basic Packages
 ```
 pacstrap -K /mnt base linux linux-firmware sudo vim zsh man base-devel grub efibootmgr mkinitcpio nano
 ```
-#### System Configuration <a name="configure"></a>
+#### System Configuration ☑️ <a name="configure"></a>
 ***
 1. Generate fstab file
 ```
@@ -171,7 +175,7 @@ Check if /etc/local.conf file can be created correctly
 echo 'LANG=en_US.UTF-8' >> /etc/local.conf
 cat /etc/locale.conf
 ```
-#### Network Configuration <a name="network"></a>
+#### Network Configuration ☎️ <a name="network"></a>
 ***
 1. Create a Hostname
 ```
@@ -184,7 +188,7 @@ Example: echo archUser > /etc/hostname
 :1         localhost
 127.0.1.1  localhost
 ```
-#### GRUB Installation <a name="grub"></a>
+#### GRUB Installation 💻 <a name="grub"></a>
 ***
 1. Type down these commands (Make sure you are still under arch-chroot.)
 ```
@@ -194,7 +198,7 @@ mount /dev/sda1 /boot/efi
 grub-intall --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
 grub-mkconfig -o /boot/grub/grub.cfg
 ```
-#### Username and Password <a name="userPass"></a>
+#### Username and Password 📔 <a name="userPass"></a>
 ***
 1. Create User
 ```
@@ -209,7 +213,7 @@ passwd [username]
 EDITOR=nano visudo
 [username] ALL=(ALL:ALL) ALL (This provides sudo privilege to the user.)
 ```
-#### Setting Up the Desktop Environment <a name="desktop"></a>
+#### Setting Up the Desktop Environment 🖥️ <a name="desktop"></a>
 ***
 1. Install xorg
 ```
@@ -239,7 +243,7 @@ systemctl enable NetworkManager
 ```
 systemctl enable wpa_supplicant.service
 ```
-#### Shut Down <a name="off"></a>
+#### Shut Down 🚪 <a name="off"></a>
 ***
 ```
 exit
@@ -248,7 +252,7 @@ shutdown now
 ```
 1. After Shutting down, do not forget to remove the live USB before powering on again. (Look at [Quick Fixes](#error) for more information)
 
-#### Installing SSH <a name="ssh"></a>
+#### Installing SSH 🖱️ <a name="ssh"></a>
 ***
 1. Install ssh package
 ```
@@ -259,7 +263,7 @@ pacman -S openssh
 ssh -p [PORT_NUMBER] [USER_NAME]@[SERVER_IP_ADDRESS]
 Example: ssh -p 22 sysadmin@10.1.1.325
 ```
-#### Terminal Color-Coding <a name="terminalColor"></a>
+#### Terminal Color-Coding 🖍️ <a name="terminalColor"></a>
 ***
 1. First Create a Backup of the Settings File
 ```
@@ -282,7 +286,7 @@ sudo mv bash.bashrc /etc/bash.bashrc
 sudo mv DIR_COLORS /etc/
 mv .bashrc ~/.bashrc
 ```
-#### Adding Aliases <a name="alias"></a>
+#### Adding Aliases 📓 <a name="alias"></a>
 ***
 Reference: [MORE_ON_ALIAS](https://www.cyberciti.biz/faq/create-permanent-bash-alias-linux-unix/)
 1. Open the ~/.bashrc file
@@ -306,7 +310,7 @@ alias
 unalias [ALIAS_NAME]
 ```
 
-#### Error: Quick Fixes <a name="error"></a>
+#### Error: Quick Fixes ❓ <a name="error"></a>
 ***
 1. __Icon Not Showing on LXQT Desktop Environment__
 ```
@@ -335,5 +339,11 @@ unalias [ALIAS_NAME]
 ```
   - This is caused by the fact that the /dev/sda1 was not mounted into /boot/efi
 ```
-
+### REFERENCES <a name="reference"></a>
+1. https://wiki.archlinux.org/title/Installation_guide
+2. https://wiki.archlinux.org/title/Bash/Prompt_customization
+3. https://itsfoss.com/install-arch-linux/#:~:text=How%20to%20install%20Arch%20Linux%201%20Step%201%3A,USB%20...%204%20Step%204%3A%20Partition%20the%20disks
+4. https://www.debugpoint.com/lxqt-arch-linux-install/
+5. https://averagelinuxuser.com/linux-terminal-color/
+6. https://www.cyberciti.biz/faq/create-permanent-bash-alias-linux-unix/
 
