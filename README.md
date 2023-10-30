@@ -1,8 +1,22 @@
 # ARCH-LINUX
-### Table of Contents
+#### Table of Contents
 1. [Arch Linux Downloads and Pre-Installation Steps](#preinstall)
 2. [Installation Steps on VMWare](#vmware)
 3. [Check Connection with the Internet](#connection)
+4. [Update System Clock](#clock)
+5. [Formatting the Partitions](#format)
+6. [Mirror Selection](#mirror)
+7. [Mount File Systems](#mount)
+8. [Package Installation Including Another Shell](#package)
+9. [System Configuration](#configure)
+10. [Network Configuration](#network)
+11. [Username and Password](#userPass)
+12. [Setting Up the Desktop Environment](#desktop)
+13. [Shut Down](#off)
+14. [Installing SSH](#ssh)
+15. [Terminal Color-Coding](#terminalColor)
+16. [Adding Aliases](#alias)
+17. [Error: Quick Fixes](#error)
 
 #### Arch Linux Downloads and Pre-Installation Steps <a name="preinstall"></a>
 ***
@@ -41,7 +55,7 @@ ip link
 ```
 ping archlinux.org
 ```
-__Update System Clock__
+#### Update System Clock <a name="clock"></a>
 ***
 1. Check the time zone.
 ```
@@ -76,7 +90,7 @@ First Sector: [TYPE_DEFAULT_VALUE]
 Last Sector: [VALUE_OF_CHOICE] (For this, +18G was added)
 Command (m for help): w (Write table to disk and exit.)
 ```
-__Formatting the Partitions__
+#### Formatting the Partitions <a name="format"></a>
 ***
 1. For the Root Partition
 ```
@@ -88,7 +102,7 @@ Example: mkfs.ext4 /dev/sda2
 mkfs.fat -F 32 /dev/[EFI_SYSTEM_PAARTITION]
 Example: mkfs -F 32 /dev/sda1
 ```
-__Mirror Selection__
+#### Mirror Selection <a name="mirror"></a>
 ***
 1. Enable pacman to be able to download and install software
 ```
@@ -106,6 +120,220 @@ cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
 ```
 reflector -c "US" -f 12 -l 10 -n 12 --save /etc/pacman.d/mirrorlist
 ```
+#### Mount File Systems <a name="mount"></a>
+***
+1. Mount Root Partition
+```
+mount /dev/[ROOT_PARTITION] /mnt
+Example: mount /dev/sda2 /mnt
+```
+2. Mount UEFI System
+```
+mount --mkdir /dev/[UEFI_SYSTEM_PARTITION] /mnt/boot
+Example: mount --mkdir /dev/sda1 /mnt/boot
+```
+3. Check Partition Layout
+```
+sudo fdisk -l
+OR
+df -h
+```
+#### Basic Installation <a name="package"></a>
+***
+1. Install Basic Packages
+```
+pacstrap -K /mnt base linux linux-firmware sudo vim zsh man base-devel grub efibootmgr mkinitcpio nano
+```
+#### System Configuration <a name="configure"></a>
+***
+1. Generate fstab file
+```
+genfstab -U /mnt >> /mnt/etc/fstab
+```
+2. Check to see if the fstab file has been generated correctly.
+```
+cat /mnt/etc/fstab
+```
+3. Change root into the new system (Once doing so, stay as root for the rest of the instruction until told to exit)
+```
+arch-chroot /mnt
+```
+4. Time Zone:
+```
+ln -sf /usr/share/zoneinfo/[REGION]/[CITY] /etc/localtime
+Example: ln -sf /usr/share/zoneinfo/America/Chicago /etc/localtime
+```
+5. Localization
+```
+vim /etc/locale.gen
+Remove # in front of the desired localization (e.g. en_US.UTF-8 UTF-8)
+Check if /etc/local.conf file can be created correctly
+echo 'LANG=en_US.UTF-8' >> /etc/local.conf
+cat /etc/locale.conf
+```
+#### Network Configuration <a name="network"></a>
+***
+1. Create a Hostname
+```
+echo [HOSTNAME] > /etc/hostname
+Example: echo archUser > /etc/hostname
+```
+2. Configure the /etc/hosts
+```
+127.0.0.1  localhost
+:1         localhost
+127.0.1.1  localhost
+```
+#### GRUB Installation <a name="grub"></a>
+***
+1. Type down these commands (Make sure you are still under arch-chroot.)
+```
+pacman -S grub efibootmgr
+mkdir /boot/efi
+mount /dev/sda1 /boot/efi
+grub-intall --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
+grub-mkconfig -o /boot/grub/grub.cfg
+```
+#### Username and Password <a name="userPass"></a>
+***
+1. Create User
+```
+useradd -m [username]
+```
+2. Create Password for the User
+```
+passwd [username]
+```
+3. Permissions for the User
+```
+EDITOR=nano visudo
+[username] ALL=(ALL:ALL) ALL (This provides sudo privilege to the user.)
+```
+#### Setting Up the Desktop Environment <a name="desktop"></a>
+***
+1. Install xorg
+```
+sudo pacman -S --needed xorg
+```
+2. Install lxqt
+```
+sudo pacman -S --needed lxqt xdgutils ttf-freefont sddm
+```
+3. Install Extra Components for the Desktop
+```
+sudo pacman -S --needed libpulse libstatgrab libsysstat lm_sensors network-manager-applet oxygen-icons pavucontrol-qt
+```
+4. Install a browser and other applications
+```
+sudo pacman -S --needed firefox vlc filezilla leafpad xscreensaver archlinux-wallpaper
+```
+5. Enable sddm
+```
+systemctl enable sddm
+```
+6. Enable Network Manager
+```
+systemctl enable NetworkManager
+```
+7. Enable WPA Supplicant Service
+```
+systemctl enable wpa_supplicant.service
+```
+#### Shut Down <a name="off"></a>
+***
+```
+exit
+umount -l /mnt
+shutdown now
+```
+1. After Shutting down, do not forget to remove the live USB before powering on again. (Look at [Quick Fixes](#error) for more information)
 
+#### Installing SSH <a name="ssh"></a>
+***
+1. Install ssh package
+```
+pacman -S openssh
+```
+2. To connect to a gateway
+```
+ssh -p [PORT_NUMBER] [USER_NAME]@[SERVER_IP_ADDRESS]
+Example: ssh -p 22 sysadmin@10.1.1.325
+```
+#### Terminal Color-Coding <a name="terminalColor"></a>
+***
+1. First Create a Backup of the Settings File
+```
+(Not System Wide)
+cp .bashrc .bashrc.backup
+(For System-Wide bashrc)
+sudo cp /etc/bash.bashrc /etc/bash.bashrc.backup
+```
+2. Configure the files given in [COLOR_CODE](https://wiki.archlinux.org/title/Bash/Prompt_customization)
+3. Sample Configuration Files are given in: [SAMPLE_COLOR](https://averagelinuxuser.com/linux-terminal-color/)
+   - Things that should be downloaded before downloading the configured files.
+```
+sudo pacman -S zip
+sudo pacman -S unzip
+sudo pacman -Sy wget
+```
+4. Move the Configured files from the given sample to the specific /etc directories.
+```
+sudo mv bash.bashrc /etc/bash.bashrc
+sudo mv DIR_COLORS /etc/
+mv .bashrc ~/.bashrc
+```
+#### Adding Aliases <a name="alias"></a>
+***
+Reference: [MORE_ON_ALIAS](https://www.cyberciti.biz/faq/create-permanent-bash-alias-linux-unix/)
+1. Open the ~/.bashrc file
+```
+nano ~.bashrc
+```
+2. Add an alias command
+```
+Example: alias update='sudo pacman -Syu'
+```
+3. Activate the alias
+```
+source ~/.bashrc
+```
+4. To list all the aliases
+```
+alias
+```
+5. Unactivate an alias
+```
+unalias [ALIAS_NAME]
+```
+
+#### Error: Quick Fixes <a name="error"></a>
+***
+1. __Icon Not Showing on LXQT Desktop Environment__
+```
+   - Click on the logo at the left corner
+   - Click on "Preferences" -> "LXQT Settings" -> "Appearance" -> "Icons Theme" -> "Oxygen (Oxygen Team)"
+```
+2. __"Not Enough Free Disk Space"__
+```
+  - Not enough room was reserved for partition number 2 (i.e. the Root Partition)
+  - umount -l /dev/sda1
+  - Check to see if sda1 has actually been unmounted: df -h
+  - If it has not been been unmounted: pkill target_process -> umount /dev/sda1
+  - fdisk /dev/sda
+  - Command(m for help): n -> Partition type: p -> Partition number: 2 -> first sector: [DEFAULT_VALUE] -> last sectore: [CHOOSE_LARGER VALUE] (e.g. +60G)
+  - Command (m for help): w
+```
+3. __After Setting up the Arch Linux and Rebooting it, it completely starts over the Arch Settings.__
+```
+  - Do not forget to remove the live USB before powering on the Arch again.
+  - Go to "Settings"
+  - Click on "CD/DVD (SATA)"
+  - Uncheckmark the "Connect at power on"
+  - Click "OK"
+```
+4. __"Cannot find the EFI Directory" although the firmware is UEFI__
+```
+  - This is caused by the fact that the /dev/sda1 was not mounted into /boot/efi
+```
 
 
